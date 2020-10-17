@@ -22,6 +22,7 @@ class FailedDnsLookup(Exception):
     """
 
     def __init__(self, value):
+        super().__init__(value)
         self.value = '{}'.format(value)
 
     def __str__(self):  # pragma: no cover
