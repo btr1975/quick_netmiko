@@ -24,7 +24,7 @@ class FailedDnsLookup(Exception):
     def __init__(self, value):
         self.value = '{}'.format(value)
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return repr(self.value)
 
 
@@ -74,7 +74,7 @@ class QuickNetmiko:
         self.password = password
         self.device_ip_name = device_ip_name
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return '{} device_name = {}'.format(type(self), self.device_ip_name)
 
     def __get_params(self):
