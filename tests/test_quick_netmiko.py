@@ -95,8 +95,8 @@ def test_send_single_command_lookup(monkeypatch, get_ios_test_data_int_brief):
     def mock_connection_disco(*args, **kwargs):
         return True
 
-    def socket_lookup():
-        return '10.0.0.101'
+    def socket_lookup(*args, **kwargs):
+        return '10.0.0.100'
 
     monkeypatch.setattr(socket, 'gethostbyname', socket_lookup)
     monkeypatch.setattr(ConnectHandler, '__init__', mock_init)
@@ -104,7 +104,7 @@ def test_send_single_command_lookup(monkeypatch, get_ios_test_data_int_brief):
     monkeypatch.setattr(CiscoIosSSH, 'send_command', mock_command_get)
     monkeypatch.setattr(CiscoIosSSH, 'disconnect', mock_connection_disco)
 
-    nm_obj = QuickNetmiko('10.0.0.100', 'cisco_ios', 'temp', 'temp')
+    nm_obj = QuickNetmiko('FAKE-DEVICE', 'cisco_ios', 'temp', 'temp')
 
     returned_data = nm_obj.send_commands('show ip interface brief')
 
