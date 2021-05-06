@@ -11,6 +11,7 @@ Welcome to quick_netmiko's documentation!
    :caption: Contents:
 
    doc-source/quick_netmiko/modules
+   doc-source/examples/index
 
 
 
