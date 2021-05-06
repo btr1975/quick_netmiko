@@ -14,16 +14,23 @@ import os
 import sys
 base_path = os.path.split(os.path.join(os.path.abspath(os.path.dirname(__name__))))[0]
 sys.path.append(base_path)
+about = {}
+with open(os.path.join(base_path, 'quick_netmiko', 'version.py'), 'r', encoding='utf-8') as f:
+    exec(f.read(), about)
 
+
+# -- Added for readthedocs.org -----------------------------------------------
+
+master_doc = 'index'
 
 # -- Project information -----------------------------------------------------
 
-project = 'quick_netmiko'
-copyright = '2020, Ben Trachtenberg'
-author = 'Ben Trachtenberg'
-
 # The full version, including alpha/beta/rc tags
-release = '1.0.0'
+release = about['__version__']
+
+project = f'{about["__title__"]} v{release}'
+copyright = about['__copyright__']
+author = about['__author__']
 
 
 # -- General configuration ---------------------------------------------------
