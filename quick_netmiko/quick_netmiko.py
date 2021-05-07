@@ -23,7 +23,46 @@ class FailedDnsLookup(Exception):
 
     def __init__(self, value):
         super().__init__(value)
-        self.value = '{}'.format(value)
+        self.value = f'{value}'
+
+    def __str__(self):  # pragma: no cover
+        return repr(self.value)
+
+
+class BadProtocol(Exception):
+    """
+    Exception for Protocol Exceptions
+    """
+
+    def __init__(self, value):
+        super().__init__(value)
+        self.value = f'{value}'
+
+    def __str__(self):  # pragma: no cover
+        return repr(self.value)
+
+
+class BadSshDeviceType(Exception):
+    """
+    Exception for a bad ssh device type Exceptions
+    """
+
+    def __init__(self, value):
+        super().__init__(value)
+        self.value = f'{value}'
+
+    def __str__(self):  # pragma: no cover
+        return repr(self.value)
+
+
+class BadTelnetDeviceType(Exception):
+    """
+    Exception for a bad telnet device type Exceptions
+    """
+
+    def __init__(self, value):
+        super().__init__(value)
+        self.value = f'{value}'
 
     def __str__(self):  # pragma: no cover
         return repr(self.value)
@@ -36,20 +75,25 @@ class QuickNetmiko:
     :type device_ip_name: String
     :param device_ip_name: The device name or ip address
     :type device_type: String
-    :param device_type: One of the following {'cisco_nxos_ssh', 'cisco_ios', 'cisco_iosxr'}
+    :param device_type: The device type see ssh_connections, and telnet_connections
     :type username: String
     :param username: The username to use
     :type password: String
     :param password: The password to use
+    :type protocol: String
+    :param protocol: One of the following {'ssh', 'telnet'} default: ssh
 
     :rtype: None
     :returns: None
 
-    :raises AttributeError: If device_types is not one of these {'cisco_nxos_ssh', 'cisco_ios', 'cisco_iosxr'}
+    :raises BadProtocol: If protocol is not one of the following {'ssh', 'telnet'}
+    :raises BadSshDeviceType: If protocol is ssh and device_type is not one in ssh_connections
+    :raises BadTelnetDeviceType: If protocol is telnet and device_type is not one in telnet_connections
     :raises FailedDnsLookup: If a hostname is not able to be looked up via DNS
     :raises FailedDnsLookup: If there is a timeout when looking up a hostname
 
     """
+    # Dictionary to correlate ssh device_type
     ssh_connections = {
         'ios': 'cisco_ios_ssh',
         'cisco_ios_ssh': 'cisco_ios_ssh',
@@ -62,36 +106,39 @@ class QuickNetmiko:
         'cisco_nxos_ssh': 'cisco_nxos_ssh',
         'cisco_nxos': 'cisco_nxos_ssh',
     }
-
+    # Dictionary to correlate telnet device_type
     telnet_connections = {
         'ios': 'cisco_ios_telnet',
         'cisco_ios_telnet': 'cisco_ios_telnet',
+        'cisco_ios': 'cisco_ios_telnet',
         'iosxe': 'cisco_ios_telnet',
         'iosxr': 'cisco_xr_telnet',
         'cisco_xr_telnet': 'cisco_xr_telnet',
+        'cisco_xr': 'cisco_xr_telnet',
         'nxos': 'cisco_nxos_telnet',
         'cisco_nxos_telnet': 'cisco_nxos_telnet',
+        'cisco_nxos': 'cisco_nxos_telnet',
     }
-
+    # Set of supported protocols
     protocols = {'ssh', 'telnet'}
 
     def __init__(self, device_ip_name, device_type, username, password,  # pylint: disable=too-many-arguments
                  protocol='ssh'):
         if protocol not in self.protocols:
-            raise AttributeError(f'protocol must be one of the following {self.protocols}')
+            raise BadProtocol(f'protocol must be one of the following {self.protocols}')
 
         if protocol == 'ssh':
             if not self.ssh_connections.get(device_type):  # pylint: disable=no-else-raise
-                raise AttributeError(f'device_type must be one of the following {self.ssh_connections.keys()} when'
-                                     f'protocol is ssh')
+                raise BadSshDeviceType(f'device_type must be one of the following {self.ssh_connections.keys()} when'
+                                       f'protocol is ssh')
 
             else:
                 self.device_type = self.ssh_connections.get(device_type)
 
         else:
             if not self.telnet_connections.get(device_type):  # pylint: disable=no-else-raise
-                raise AttributeError(f'device_type must be one of the following {self.telnet_connections.keys()} when'
-                                     f'protocol is telnet')
+                raise BadTelnetDeviceType(f'device_type must be one of the following {self.telnet_connections.keys()} '
+                                          f'when protocol is telnet')
 
             else:
                 self.device_type = self.telnet_connections.get(device_type)
@@ -104,17 +151,17 @@ class QuickNetmiko:
                 self.device_ip = socket.gethostbyname(device_ip_name)
 
             except socket.gaierror as e:
-                raise FailedDnsLookup('DNS lookup failed while looking up {}'.format(device_ip_name)) from e
+                raise FailedDnsLookup(f'DNS lookup failed while looking up {device_ip_name}') from e
 
             except socket.timeout as e:
-                raise FailedDnsLookup('DNS timed out while looking up {}'.format(device_ip_name)) from e
+                raise FailedDnsLookup(f'DNS timed out while looking up {device_ip_name}') from e
 
         self.username = username
         self.password = password
         self.device_ip_name = device_ip_name
 
     def __str__(self):  # pragma: no cover
-        return '{} device_name = {}'.format(type(self), self.device_ip_name)
+        return f'{type(self)} device_name = {self.device_ip_name}'
 
     def __get_params(self):
         """
@@ -195,6 +242,6 @@ class QuickNetmiko:
             data += self.__send_single_command(net_con, commands)
 
         else:
-            raise TypeError('commands must be a list, or a string but received a {}'.format(type(commands)))
+            raise TypeError(f'commands must be a list, or a string but received a {type(commands)}')
 
         return data
