@@ -50,12 +50,50 @@ class QuickNetmiko:
     :raises FailedDnsLookup: If there is a timeout when looking up a hostname
 
     """
+    ssh_connections = {
+        'ios': 'cisco_ios_ssh',
+        'cisco_ios_ssh': 'cisco_ios_ssh',
+        'cisco_ios': 'cisco_ios_ssh',
+        'iosxe': 'cisco_ios_ssh',
+        'iosxr': 'cisco_xr_ssh',
+        'cisco_xr_ssh': 'cisco_xr_ssh',
+        'cisco_xr': 'cisco_xr_ssh',
+        'nxos': 'cisco_nxos_ssh',
+        'cisco_nxos_ssh': 'cisco_nxos_ssh',
+        'cisco_nxos': 'cisco_nxos_ssh',
+    }
 
-    def __init__(self, device_ip_name, device_type, username, password):
-        device_types = {'cisco_nxos_ssh', 'cisco_ios', 'cisco_iosxr'}
+    telnet_connections = {
+        'ios': 'cisco_ios_telnet',
+        'cisco_ios_telnet': 'cisco_ios_telnet',
+        'iosxe': 'cisco_ios_telnet',
+        'iosxr': 'cisco_xr_telnet',
+        'cisco_xr_telnet': 'cisco_xr_telnet',
+        'nxos': 'cisco_nxos_telnet',
+        'cisco_nxos_telnet': 'cisco_nxos_telnet',
+    }
 
-        if device_type not in device_types:
-            raise AttributeError('device_type must be one of the following {}'.format(device_types))
+    protocols = {'ssh', 'telnet'}
+
+    def __init__(self, device_ip_name, device_type, username, password, protocol='ssh'):
+        if protocol not in self.protocols:
+            raise AttributeError(f'protocol must be one of the following {self.protocols}')
+
+        if protocol == 'ssh':
+            if not self.ssh_connections.get(device_type):
+                raise AttributeError(f'device_type must be one of the following {self.ssh_connections.keys()} when'
+                                     f'protocol is ssh')
+
+            else:
+                self.device_type = self.ssh_connections.get(device_type)
+
+        else:
+            if not self.telnet_connections.get(device_type):
+                raise AttributeError(f'device_type must be one of the following {self.telnet_connections.keys()} when'
+                                     f'protocol is telnet')
+
+            else:
+                self.device_type = self.telnet_connections.get(device_type)
 
         try:
             self.device_ip = str(ipaddress.ip_address(device_ip_name))
@@ -70,7 +108,6 @@ class QuickNetmiko:
             except socket.timeout as e:
                 raise FailedDnsLookup('DNS timed out while looking up {}'.format(device_ip_name)) from e
 
-        self.device_type = device_type
         self.username = username
         self.password = password
         self.device_ip_name = device_ip_name
