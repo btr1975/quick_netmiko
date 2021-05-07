@@ -75,12 +75,13 @@ class QuickNetmiko:
 
     protocols = {'ssh', 'telnet'}
 
-    def __init__(self, device_ip_name, device_type, username, password, protocol='ssh'):
+    def __init__(self, device_ip_name, device_type, username, password,  # pylint: disable=too-many-arguments
+                 protocol='ssh'):
         if protocol not in self.protocols:
             raise AttributeError(f'protocol must be one of the following {self.protocols}')
 
         if protocol == 'ssh':
-            if not self.ssh_connections.get(device_type):
+            if not self.ssh_connections.get(device_type):  # pylint: disable=no-else-raise
                 raise AttributeError(f'device_type must be one of the following {self.ssh_connections.keys()} when'
                                      f'protocol is ssh')
 
@@ -88,7 +89,7 @@ class QuickNetmiko:
                 self.device_type = self.ssh_connections.get(device_type)
 
         else:
-            if not self.telnet_connections.get(device_type):
+            if not self.telnet_connections.get(device_type):  # pylint: disable=no-else-raise
                 raise AttributeError(f'device_type must be one of the following {self.telnet_connections.keys()} when'
                                      f'protocol is telnet')
 
