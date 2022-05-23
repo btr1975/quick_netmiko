@@ -2,18 +2,11 @@
 This is a simple class to get command from Cisco devices
 
 """
+from typing import Optional, List, Union
 import ipaddress
 import socket
+import netmiko
 from netmiko import ConnectHandler
-__author__ = 'Benjamin P. Trachtenberg'
-__copyright__ = "Copyright (c) 2020, Benjamin P. Trachtenberg"
-__credits__ = None
-__license__ = 'The MIT License (MIT)'
-__status__ = 'prod'
-__version_info__ = (1, 0, 1)
-__version__ = '.'.join(map(str, __version_info__))
-__maintainer__ = 'Benjamin P. Trachtenberg'
-__email__ = 'e_ben_75-python@yahoo.com'
 
 
 class FailedDnsLookup(Exception):
@@ -122,8 +115,8 @@ class QuickNetmiko:
     # Set of supported protocols
     protocols = {'ssh', 'telnet'}
 
-    def __init__(self, device_ip_name, device_type, username, password,  # pylint: disable=too-many-arguments
-                 protocol='ssh'):
+    def __init__(self, device_ip_name: str, device_type: str, username: str,   # pylint: disable=too-many-arguments
+                 password: str, protocol: Optional[str] = 'ssh') -> None:
         if protocol not in self.protocols:
             raise BadProtocol(f'protocol must be one of the following {self.protocols}')
 
@@ -160,10 +153,10 @@ class QuickNetmiko:
         self.password = password
         self.device_ip_name = device_ip_name
 
-    def __str__(self):  # pragma: no cover
+    def __str__(self) -> str:  # pragma: no cover
         return f'{type(self)} device_name = {self.device_ip_name}'
 
-    def __get_params(self):
+    def __get_params(self) -> dict:
         """
         Private method to get the Netmiko connection parameters
 
@@ -179,7 +172,7 @@ class QuickNetmiko:
         return params
 
     @staticmethod
-    def __send_single_command(net_con, command):
+    def __send_single_command(net_con: netmiko.ConnectHandler, command: str) -> str:
         """
         Private method to send a command to a device and get the results
 
@@ -199,13 +192,13 @@ class QuickNetmiko:
 
         return data
 
-    def __send_list_of_commands(self, net_con, commands):
+    def __send_list_of_commands(self, net_con: netmiko.ConnectHandler, commands: List[str]) -> str:
         """
         Private method to send a list of commands to a device and get the results
 
         :type net_con: <class 'netmiko.ConnectHandler'>
         :param net_con: The netmiko connection handler object
-        :type commands: List
+        :type commands: List[str]
         :param commands: The list of commands to get data for
 
         :rtype: String
@@ -218,7 +211,7 @@ class QuickNetmiko:
 
         return data
 
-    def send_commands(self, commands):
+    def send_commands(self, commands: Union[List[str], str]) -> str:
         """
         Method to send a list of commands or single command to a device and get the results
 
