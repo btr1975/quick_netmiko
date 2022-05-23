@@ -88,6 +88,11 @@ class QuickNetmiko:
     """
     # Dictionary to correlate ssh device_type
     ssh_connections = {
+        'aruba_os': 'aruba_os_ssh',
+        'aruba_os_ssh': 'aruba_os_ssh',
+        'eos': 'arista_eos_ssh',
+        'arista_eos': 'arista_eos_ssh',
+        'arista_eos_ssh': 'arista_eos_ssh',
         'ios': 'cisco_ios_ssh',
         'cisco_ios_ssh': 'cisco_ios_ssh',
         'cisco_ios': 'cisco_ios_ssh',
@@ -101,6 +106,9 @@ class QuickNetmiko:
     }
     # Dictionary to correlate telnet device_type
     telnet_connections = {
+        'eos': 'arista_eos_telnet',
+        'arista_eos': 'arista_eos_telnet',
+        'arista_eos_telnet': 'arista_eos_telnet',
         'ios': 'cisco_ios_telnet',
         'cisco_ios_telnet': 'cisco_ios_telnet',
         'cisco_ios': 'cisco_ios_telnet',
