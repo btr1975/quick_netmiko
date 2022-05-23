@@ -14,7 +14,7 @@ packages = [
 ]
 
 install_requires = [
-    'netmiko ~= 3.4.0',
+    'netmiko ~= 4.1.0',
 ]
 
 tests_require = [
@@ -24,7 +24,7 @@ tests_require = [
 setup(
     name=about['__title__'],
     version=about['__version__'],
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     description=about['__description__'],
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -55,9 +55,9 @@ setup(
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3 :: Only',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
     ],
 )
